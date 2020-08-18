@@ -59,8 +59,8 @@ jobs:
 #             sls deploy --stage production --aws-profile production
 #           fi
        - run: |
-           python --version
            pip install -r scripts/requirements.txt
+       - run: |
            python scripts/env_version_check.py develop
        - run: |
            python scripts/env_version_check.py staging
