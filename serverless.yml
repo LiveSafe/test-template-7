@@ -48,8 +48,8 @@ provider:
 
 # you can define service wide environment variables here
   environment:
-    message: ${self:custom.envvars.${self:custom.myStage}.message}
-    # secret: ${ssm:/${self:custom.myStage}/test~true}
+    message: ${self:custom.envvars.${self:custom.stage}.message}
+    # secret: ${ssm:/${self:custom.stage}/test~true}
 
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
