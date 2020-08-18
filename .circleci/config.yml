@@ -2,8 +2,7 @@ version: 2.1
 orbs:
    aws-cli: circleci/aws-cli@1.0
    serverless: circleci/serverless-framework@1.0
-   python: circleci/python@0.3.7
-
+   python: circleci/python@0.3.2
 jobs:
    validate_version:
      executor: python/default
@@ -30,9 +29,8 @@ jobs:
                echo "The version tag ${version} already exists, please update your version file."
                exit 1
              fi
-
    deploy:
-     executor: serverless/default
+     executor: python/default
      steps:
        - checkout
        - aws-cli/setup:
