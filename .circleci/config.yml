@@ -48,18 +48,24 @@ jobs:
        - python/install-deps:
            dependency-file: scripts/requirements.txt
        - serverless/setup
+#       - run: |
+#           if python scripts/env_version_check.py develop; then
+#             sls deploy --stage develop --aws-profile nonprod
+#           fi
+#       - run: |
+#           if python scripts/env_version_check.py staging; then
+#             sls deploy --stage staging --aws-profile nonprod
+#           fi
+#       - run: |
+#           if python scripts/env_version_check.py production; then
+#             sls deploy --stage production --aws-profile production
+#           fi
        - run: |
-           if python scripts/env_version_check.py develop; then
-             sls deploy --stage develop --aws-profile nonprod
-           fi
+           python scripts/env_version_check.py develop
        - run: |
-           if python scripts/env_version_check.py staging; then
-             sls deploy --stage staging --aws-profile nonprod
-           fi
+           python scripts/env_version_check.py staging
        - run: |
-           if python scripts/env_version_check.py production; then
-             sls deploy --stage production --aws-profile production
-           fi
+           python scripts/env_version_check.py production
 workflows:
   check_version_and_deploy:
     jobs:
