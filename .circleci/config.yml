@@ -3,17 +3,15 @@ orbs:
    aws-cli: circleci/aws-cli@1.0
    serverless: circleci/serverless-framework@1.0
    python: circleci/python@0.3.2
-#   git: compute/git@0.0.9
+
 jobs:
    validate_version:
      executor: python/default
      steps:
        - checkout
-#       - git/configure
        - run:
            name: Check Version
            command: |
-             set -x
              # get version from version file
              version="$(cat version)"
 
@@ -29,12 +27,9 @@ jobs:
 
              # check that it does not match any existing version tags
              if git tag -l | grep -wq "${version}"; then
-               echo test5
                echo "The version tag ${version} already exists, please update your version file."
                exit 1
              fi
-             echo test6
-
 
    deploy:
      executor: serverless/default
@@ -54,18 +49,15 @@ jobs:
            dependency-file: scripts/requirements.txt
        - serverless/setup
        - run: |
-           python scripts/env_version_check.py develop
-           if [ $? -eq 0 ]; then
+           if python scripts/env_version_check.py develop; then
              sls deploy --stage develop --aws-profile nonprod
            fi
        - run: |
-           python scripts/env_version_check.py staging
-           if [ $? -eq 0 ]; then
+           if python scripts/env_version_check.py staging; then
              sls deploy --stage staging --aws-profile nonprod
            fi
        - run: |
-           python scripts/env_version_check.py production
-           if [ $? -eq 0 ]; then
+           if python scripts/env_version_check.py production; then
              sls deploy --stage production --aws-profile production
            fi
 workflows:
