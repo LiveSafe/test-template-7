@@ -28,6 +28,8 @@ jobs:
 
              # check that it does not match any existing version tags
              which git
+             echo $CIRCLE_BRANCH
+             git branch --set-upstream-to=origin/$CIRCLE_BRANCH $CIRCLE_BRANCH≤
              git tag -l | grep -wq "${version}"
              if [ $? -ne 0 ]; then
                echo test5
