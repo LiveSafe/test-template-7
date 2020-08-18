@@ -4,10 +4,10 @@ import yaml
 
 environment = sys.argv[1]
 
-with open('../version') as stream:
+with open('version') as stream:
     service_version = semantic_version.Version(stream.read().replace('\n', ''))
 
-with open('../serverless.yml') as stream:
+with open('serverless.yml') as stream:
     sls_configs = yaml.safe_load(stream)
     try:
         min_version = sls_configs['custom']['deployment_configs'][environment]['min_version']
