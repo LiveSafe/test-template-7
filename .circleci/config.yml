@@ -28,8 +28,7 @@ jobs:
              fi
 
              # check that it does not match any existing version tags
-             git tag -l | grep -wq "${version}"
-             if [ $? -eq 0 ]; then
+             if git tag -l | grep -wq "${version}"; then
                echo test5
                echo "The version tag ${version} already exists, please update your version file."
                exit 1
