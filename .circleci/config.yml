@@ -3,13 +3,13 @@ orbs:
    aws-cli: circleci/aws-cli@1.0
    serverless: circleci/serverless-framework@1.0
    python: circleci/python@0.3.2
-   git: compute/git@0.0.9
+#   git: compute/git@0.0.9
 jobs:
    validate_version:
      executor: python/default
      steps:
        - checkout
-       - git/configure
+#       - git/configure
        - run:
            name: Check Version
            command: |
@@ -19,17 +19,15 @@ jobs:
              # check that version is a valid semantic versioning number
              semver_regex="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
              if [[ "${version}" =~ $semver_regex ]]; then
-               echo test1
                :
-               echo test2
              else
-               echo test3
                echo "The version tag ${version} is not a valid semantic version number."
                echo "https://semver.org/spec/v2.0.0.html"
                exit 1
              fi
-             echo test4
+
              # check that it does not match any existing version tags
+             which git
              git tag -l | grep -wq "${version}"
              if [ $? -ne 0 ]; then
                echo test5
