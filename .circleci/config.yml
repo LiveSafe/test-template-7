@@ -46,26 +46,20 @@ jobs:
            aws-region: PROD_AWS_DEFAULT_REGION
            profile-name: production
        - serverless/setup
-#       - run: |
-#           if python scripts/env_version_check.py develop; then
-#             sls deploy --stage develop --aws-profile nonprod
-#           fi
-#       - run: |
-#           if python scripts/env_version_check.py staging; then
-#             sls deploy --stage staging --aws-profile nonprod
-#           fi
-#       - run: |
-#           if python scripts/env_version_check.py production; then
-#             sls deploy --stage production --aws-profile production
-#           fi
        - run: |
            pip install -r scripts/requirements.txt
        - run: |
-           python scripts/env_version_check.py develop
+           if python scripts/env_version_check.py develop; then
+             sls deploy --stage develop --aws-profile nonprod
+           fi
        - run: |
-           python scripts/env_version_check.py staging
+           if python scripts/env_version_check.py staging; then
+             sls deploy --stage staging --aws-profile nonprod
+           fi
        - run: |
-           python scripts/env_version_check.py production
+           if python scripts/env_version_check.py production; then
+             sls deploy --stage production --aws-profile production
+           fi
 workflows:
   check_version_and_deploy:
     jobs:
