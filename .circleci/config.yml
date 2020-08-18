@@ -1,0 +1,73 @@
+version: 2.1
+orbs:
+   aws-cli: circleci/aws-cli@1.0
+   serverless: circleci/serverless-framework@1.0
+jobs:
+   validate_version:
+     docker:
+       - image: circleci/python
+     steps:
+       - checkout
+       - run:
+           name: Check Version
+           command: |
+             # get version from version file
+             version="$(cat version)"
+
+             # check that version is a valid semantic versioning number
+             semver_regex="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
+             if [[ "${version}" =~ $semver_regex ]]; then
+               echo "The version tag ${version} is not a valid semantic version number."
+               echo "https://semver.org/spec/v2.0.0.html"
+               exit 1
+             fi
+
+             # check that it does not match any existing version tags
+             git tag -l | grep -wq "${version}"
+             if [ $? -ne 0 ]; then
+               echo "The version tag ${version} already exists, please update your version file."
+               exit 1
+             fi
+
+   deploy:
+     executor: serverless/default
+     steps:
+       - checkout
+       - aws-cli/setup:
+           aws-access-key-id: NONPROD_AWS_ACCESS_KEY_ID
+           aws-secret-access-key: NONPROD_AWS_SECRET_ACCESS_KEY
+           aws-region: NONPROD_AWS_DEFAULT_REGION
+           profile-name: nonprod
+       - aws-cli/setup:
+           aws-access-key-id: PROD_AWS_ACCESS_KEY_ID
+           aws-secret-access-key: PROD_AWS_SECRET_ACCESS_KEY
+           aws-region: PROD_AWS_DEFAULT_REGION
+           profile-name: production
+       - python/install-deps:
+           dependency-file: scripts/requirements.txt
+       - serverless/setup
+       - run: |
+           python scripts/env_version_check.py develop
+           if [ $? -eq 0 ]; then
+             sls deploy --stage develop --aws-profile nonprod
+           fi
+       - run: |
+           python scripts/env_version_check.py staging
+           if [ $? -eq 0 ]; then
+             sls deploy --stage staging --aws-profile nonprod
+           fi
+       - run: |
+           python scripts/env_version_check.py production
+           if [ $? -eq 0 ]; then
+             sls deploy --stage production --aws-profile production
+           fi
+workflows:
+  check_version_and_deploy:
+    jobs:
+      - validate_version
+      - deploy:
+          context: deploy-lambda
+          filters:
+            branches:
+              only:
+                - master
