@@ -3,11 +3,13 @@ orbs:
    aws-cli: circleci/aws-cli@1.0
    serverless: circleci/serverless-framework@1.0
    python: circleci/python@0.3.2
+   git: compute/git@0.0.9
 jobs:
    validate_version:
      executor: python/default
      steps:
        - checkout
+       - git/configure
        - run:
            name: Check Version
            command: |
